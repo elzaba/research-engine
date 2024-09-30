@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Research Paper Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #search-container {
+            text-align: center;
+        }
+        #search-bar {
+            width: 400px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="search-container">
+    <h1>Academic Paper Search</h1>
+    <form th:action="@{/search}" method="get">
+        <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
+        <button id="search-button" type="submit">Search</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .result {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .result-link {
+            font-size: 14px;
+            color: blue;
+            text-decoration: none;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Search Results for: [[${query}]]</h1>
+
+<!-- Search Form -->
+<form method="get" action="/search">
+    <input type="text" name="query" placeholder="Search..." th:value="${query}"/>
+    <select name="size">
+        <option value="10" th:selected="${pageSize == 10}">10</option>
+        <option value="20" th:selected="${pageSize == 20}">20</option>
+        <option value="50" th:selected="${pageSize == 50}">50</option>
+    </select>
+    <input type="submit" value="Search"/>
+</form>
+
+<ul>
+    <li th:each="paper : ${results}" class="result">
+        <span class="result-title" th:text="${paper.title}"></span><br/>
+        <a class="result-link" th:href="@{${'file://' + paper.path}}" target="_blank">Open Document</a>
+    </li>
+</ul>
+
+<!-- Pagination -->
+<div class="pagination">
+    <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize})}">Previous</a>
+    <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize})}">Next</a>
+</div>
+
+</body>
+</html>
