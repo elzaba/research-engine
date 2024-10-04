@@ -1,6 +1,6 @@
 package com.irs.researchengine.controller;
 
-import com.irs.researchengine.service.LuceneService;
+import com.irs.researchengine.service.IndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
 
     @Autowired
-    private LuceneService luceneService;
+    private IndexService indexService;
 
     @PostMapping("/index")
     public ResponseEntity<String> indexDocuments() {
         try {
-            luceneService.indexPapers();
+            indexService.indexPapers();
             return ResponseEntity.ok("Indexing completed successfully.");
         } catch (Exception e) {
             e.printStackTrace();

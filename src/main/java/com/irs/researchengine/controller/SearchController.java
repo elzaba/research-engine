@@ -1,7 +1,7 @@
 package com.irs.researchengine.controller;
 
 import com.irs.researchengine.data.Paper;
-import com.irs.researchengine.service.LuceneService;
+import com.irs.researchengine.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,9 +14,9 @@ import java.util.List;
 public class SearchController {
 
     @Autowired
-    private LuceneService luceneService;
+    private SearchService searchService;
 
-    //Homepage
+    //Home page
     @GetMapping("/")
     public String home() {
         return "index";
@@ -32,11 +32,12 @@ public class SearchController {
             return "index"; // Redirect to home if query is empty
         }
         
-        List<Paper> results = luceneService.searchPapers(query, page, pageSize);
+        List<Paper> results = searchService.searchPapers(query, page, pageSize);
 
         model.addAttribute("results", results);
         model.addAttribute("query", query);
         model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", pageSize);
         return "search";
     }
 }
