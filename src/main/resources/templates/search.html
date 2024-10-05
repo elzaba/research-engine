@@ -24,6 +24,22 @@
         .pagination {
             margin-top: 20px;
         }
+        #autocomplete-suggestions {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+            position: absolute;
+            background: white;
+            z-index: 1000;
+        }
+        .suggestion-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body>
@@ -32,7 +48,10 @@
 
 <!-- Search Form -->
 <form method="get" action="/search">
-    <input type="text" name="query" placeholder="Search..." th:value="${query}"/>
+    <div style="position: relative;">
+        <input type="text" id="search-input" name="query" placeholder="Search..." th:value="${query}" autocomplete="off"/>
+        <div id="autocomplete-suggestions"></div>
+    </div>
     <select name="size">
         <option value="10" th:selected="${pageSize == 10}">10</option>
         <option value="20" th:selected="${pageSize == 20}">20</option>
@@ -54,6 +73,46 @@
     <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize})}">Previous</a>
     <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize})}">Next</a>
 </div>
+
+<script>
+    const input = document.getElementById("search-input");
+    const suggestionsContainer = document.getElementById("autocomplete-suggestions");
+
+    input.addEventListener("input", function() {
+        const query = this.value;
+        if (query.length < 2) {  // Start fetching suggestions after 2 characters
+            suggestionsContainer.style.display = "none";
+            return;
+        }
+
+        fetch(`/autocomplete?query=${query}`)
+            .then(response => response.json())
+            .then(suggestions => {
+                suggestionsContainer.innerHTML = ""; // Clear previous suggestions
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement("div");
+                        div.className = "suggestion-item";
+                        div.textContent = suggestion;
+                        div.onclick = () => {
+                            input.value = suggestion; // Fill input with selected suggestion
+                            suggestionsContainer.style.display = "none"; // Hide suggestions
+                        };
+                        suggestionsContainer.appendChild(div);
+                    });
+                    suggestionsContainer.style.display = "block"; // Show suggestions
+                } else {
+                    suggestionsContainer.style.display = "none"; // Hide if no suggestions
+                }
+            });
+    });
+
+    document.addEventListener("click", function(event) {
+        if (!suggestionsContainer.contains(event.target) && event.target !== input) {
+            suggestionsContainer.style.display = "none"; // Hide suggestions on outside click
+        }
+    });
+</script>
 
 </body>
 </html>
