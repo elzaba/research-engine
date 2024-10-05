@@ -1,7 +1,8 @@
 package com.irs.researchengine.service;
 
 import com.irs.researchengine.data.Paper;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import com.irs.researchengine.nlp.CustomAnalyzer;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -34,7 +35,7 @@ public class SearchService {
              DirectoryReader reader = DirectoryReader.open(dir)) {
 
             IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser parser = new MultiFieldQueryParser(new String[]{"title", "contents"}, new StandardAnalyzer());
+            QueryParser parser = new MultiFieldQueryParser(new String[]{"title", "contents"}, new CustomAnalyzer());
             Query query = parser.parse(queryStr);
 
             TopDocs results = searcher.search(query, (page + 1) * pageSize);

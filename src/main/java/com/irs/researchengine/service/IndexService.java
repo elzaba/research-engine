@@ -1,7 +1,6 @@
 package com.irs.researchengine.service;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -11,6 +10,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.irs.researchengine.nlp.CustomAnalyzer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +28,7 @@ public class IndexService {
 
     public void indexPapers() throws IOException {
         try (Directory dir = FSDirectory.open(Paths.get(INDEX_PATH))) {
-            Analyzer analyzer = new StandardAnalyzer();
+            Analyzer analyzer = new CustomAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 
@@ -52,12 +52,25 @@ public class IndexService {
         try (InputStream stream = Files.newInputStream(file);
              BufferedReader br = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 
-            String title = br.readLine(); // Read the first line as title
+        	String title = null; 
             StringBuilder content = new StringBuilder();
             String line;
 
+            // Read lines to determine title and content
             while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
+                // Check if the line is a common term indicating it's not a valid title
+                if (title == null) {
+                    line = line.trim(); // Trim whitespace
+                    if (line.equalsIgnoreCase("ABSTRACT") || 
+                        line.equalsIgnoreCase("Keywords") ||
+                        line.equalsIgnoreCase("CONCLUSION") ||
+                        line.equalsIgnoreCase("SUMMARY")) {
+                        continue; // Skip this line
+                    }
+                    title = line; // Set title if it's not a common term
+                } else {
+                    content.append(line).append("\n");
+                }
             }
 
             Document doc = new Document();
