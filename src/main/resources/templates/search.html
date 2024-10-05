@@ -44,6 +44,7 @@
 <ul>
     <li th:each="paper : ${results}" class="result">
         <span class="result-title" th:text="${paper.title}"></span><br/>
+        <span class="result-snippet" th:text="${paper.contents.substring(0, 300) + '...'}" style="color: gray;"></span><br/>
         <a class="result-link" th:href="@{${'file://' + paper.path}}" target="_blank">Open Document</a>
     </li>
 </ul>

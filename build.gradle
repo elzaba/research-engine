@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.apache.lucene:lucene-core:8.10.0'
 	implementation 'org.apache.lucene:lucene-analyzers-common:8.10.0'
 	implementation 'org.apache.lucene:lucene-queryparser:8.10.0'
+	implementation 'org.apache.opennlp:opennlp-tools:2.0.0'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
