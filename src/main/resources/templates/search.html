@@ -38,6 +38,9 @@
         <option value="20" th:selected="${pageSize == 20}">20</option>
         <option value="50" th:selected="${pageSize == 50}">50</option>
     </select>
+    <!-- Proximity Search Option -->
+    <label for="proximity">Proximity Search</label>
+    <input type="checkbox" name="proximity" th:checked="${proximitySearch}"/>
     <input type="submit" value="Search"/>
 </form>
 
@@ -51,8 +54,8 @@
 
 <!-- Pagination -->
 <div class="pagination">
-    <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize})}">Previous</a>
-    <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize})}">Next</a>
+    <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch})}">Previous</a>
+    <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch})}">Next</a>
 </div>
 
 </body>

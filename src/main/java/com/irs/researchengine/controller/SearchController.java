@@ -16,7 +16,7 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-    //Home page
+    // Home page
     @GetMapping("/")
     public String home() {
         return "index";
@@ -27,17 +27,21 @@ public class SearchController {
     public String searchPapers(@RequestParam(name = "query", required = false) String query,
                                @RequestParam(value = "page", defaultValue = "0") int page,
                                @RequestParam(value = "size", defaultValue = "10") int pageSize,
+                               @RequestParam(value = "proximity", defaultValue = "false") boolean proximitySearch,
                                Model model) throws Exception {
+
         if (query == null || query.isEmpty()) {
             return "index"; // Redirect to home if query is empty
         }
-        
-        List<Paper> results = searchService.searchPapers(query, page, pageSize);
+
+        // Perform search
+        List<Paper> results = searchService.searchPapers(query, page, pageSize, proximitySearch);
 
         model.addAttribute("results", results);
         model.addAttribute("query", query);
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("proximitySearch", proximitySearch);
         return "search";
     }
 }

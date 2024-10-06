@@ -26,6 +26,9 @@
             border: none;
             cursor: pointer;
         }
+        #options {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +36,19 @@
     <h1>Academic Paper Search</h1>
     <form th:action="@{/search}" method="get">
         <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
+        <div id="options">
+            <!-- Proximity Search Option -->
+            <label for="proximity">Enable Proximity Search</label>
+            <input type="checkbox" name="proximity"><br><br>
+
+            <!-- Page Size Option -->
+            <label for="size">Results per page:</label>
+            <select name="size">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+        </div>
         <button id="search-button" type="submit">Search</button>
     </form>
 </div>
