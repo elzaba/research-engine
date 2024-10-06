@@ -3,6 +3,7 @@ package com.irs.researchengine.nlp;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.ngram.EdgeNGramTokenFilter;
 import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -49,7 +50,13 @@ public class CustomAnalyzer extends Analyzer {
         tokenStream = new OpenNLPLemmatizerFilter(tokenStream, posTagger, lemmatizer);
 
         // Adding N-gram tokenization for fuzzy matching and autocomplete
-        tokenStream = new NGramTokenFilter(tokenStream, 2, 3, true);  // Generates 2-gram and 3-gram tokens
+        // Apply N-gram only on titles for autocomplete
+        if ("title".equals(fieldName)) {
+            tokenStream = new EdgeNGramTokenFilter(tokenStream, 2, 5, true);  // Edge N-grams for auto-complete
+        } else {
+            // Apply N-gram tokenization for general fuzzy matching on other fields
+            tokenStream = new NGramTokenFilter(tokenStream, 2, 3, true);
+        }
 
         return new TokenStreamComponents(tokenizer, tokenStream);
     }

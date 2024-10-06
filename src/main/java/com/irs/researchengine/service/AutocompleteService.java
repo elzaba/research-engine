@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AutocompleteService {
-
     @Value("${index.path}")
     private String INDEX_PATH;
 
@@ -30,16 +29,21 @@ public class AutocompleteService {
              DirectoryReader reader = DirectoryReader.open(dir)) {
              
             IndexSearcher searcher = new IndexSearcher(reader);
-            // Use a prefix query to get suggestions
-            Query query = new PrefixQuery(new Term("title", prefix.toLowerCase()));
-            TopDocs results = searcher.search(query, 10);  // Limit to 10 suggestions
+            
+            // Prefix query for efficient matching of N-grams
+            Query prefixQuery = new PrefixQuery(new Term("title", prefix.toLowerCase()));
+
+            // Search for the query
+            TopDocs results = searcher.search(prefixQuery, 10);  // Limit to 10 suggestions
             
             for (ScoreDoc scoreDoc : results.scoreDocs) {
                 Document doc = searcher.doc(scoreDoc.doc);
-                suggestions.add(doc.get("title"));
+                String title = doc.get("title");
+                if (!suggestions.contains(title)) {  // Avoid duplicate suggestions
+                    suggestions.add(title);
+                }
             }
         }
-        
         return suggestions;
     }
 }
