@@ -4,25 +4,126 @@
     <title>Search Results</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
             padding: 20px;
+            color: #333;
+        }
+        h1 {
+            font-size: 24px;
+            color: #444;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #search-input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+        #search-input::placeholder {
+            color: #aaa;
+        }
+        .search-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-label {
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+        select, input[type="checkbox"] {
+            margin-left: 10px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
         }
         .result {
             margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .result-title {
             font-size: 18px;
             font-weight: bold;
+            color: #1a0dab;
+            text-decoration: none;
+            display: block;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        .result-snippet {
+            font-size: 14px;
+            color: #545454;
+            margin-top: 5px;
         }
         .result-link {
             font-size: 14px;
-            color: blue;
+            color: #006621;
             text-decoration: none;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .result-link:hover {
+            text-decoration: underline;
         }
         .pagination {
             margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .pagination a {
+            padding: 10px 15px;
+            margin: 0 5px;
+            background-color: #f1f1f1;
+            color: #333;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .pagination a:hover {
+            background-color: #e0e0e0;
         }
         #autocomplete-suggestions {
             border: 1px solid #ccc;
@@ -32,9 +133,10 @@
             position: absolute;
             background: white;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .suggestion-item {
-            padding: 8px;
+            padding: 10px;
             cursor: pointer;
         }
         .suggestion-item:hover {
@@ -44,29 +146,32 @@
 </head>
 <body>
 
-<h1>Search Results for: [[${query}]]</h1>
+<div class="search-container">
+    <h1>Search Results for: [[${query}]]</h1>
 
-<!-- Search Form -->
-<form method="get" action="/search">
-    <div style="position: relative;">
+    <!-- Search Form -->
+    <form class="search-form" method="get" action="/search">
         <input type="text" id="search-input" name="query" placeholder="Search..." th:value="${query}" autocomplete="off"/>
-        <div id="autocomplete-suggestions"></div>
+        <button type="submit" class="search-button">Search</button>
+    </form>
+    
+    <div class="filter-container">
+        <label class="filter-label" for="size">Results per page:</label>
+        <select name="size" th:value="${pageSize}">
+            <option value="10" th:selected="${pageSize == 10}">10</option>
+            <option value="20" th:selected="${pageSize == 20}">20</option>
+            <option value="50" th:selected="${pageSize == 50}">50</option>
+        </select>
+
+        <label class="filter-label" for="proximity">Proximity Search:</label>
+        <input type="checkbox" name="proximity" th:checked="${proximitySearch}"/>
     </div>
-    <select name="size">
-        <option value="10" th:selected="${pageSize == 10}">10</option>
-        <option value="20" th:selected="${pageSize == 20}">20</option>
-        <option value="50" th:selected="${pageSize == 50}">50</option>
-    </select>
-    <!-- Proximity Search Option -->
-    <label for="proximity">Proximity Search</label>
-    <input type="checkbox" name="proximity" th:checked="${proximitySearch}"/>
-    <input type="submit" value="Search"/>
-</form>
+</div>
 
 <ul>
     <li th:each="paper : ${results}" class="result">
-        <span class="result-title" th:text="${paper.title}"></span><br/>
-        <span class="result-snippet" th:text="${paper.contents.substring(0, 300) + '...'}" style="color: gray;"></span><br/>
+        <a class="result-title" th:href="@{${'file://' + paper.path}}" target="_blank" th:text="${paper.title}"></a>
+        <p class="result-snippet" th:text="${paper.contents.substring(0, 400) + '...'}"></p>
         <a class="result-link" th:href="@{${'file://' + paper.path}}" target="_blank">Open Document</a>
     </li>
 </ul>
@@ -76,6 +181,8 @@
     <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch})}">Previous</a>
     <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch})}">Next</a>
 </div>
+
+<div id="autocomplete-suggestions"></div>
 
 <script>
     const input = document.getElementById("search-input");

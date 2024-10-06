@@ -2,55 +2,117 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Research Paper Search Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMt23aF+8Yp6Lsyf2/mF7BL4U+U5iHtJ24gTAl" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        #header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
         }
         #search-container {
-            text-align: center;
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
         }
         #search-bar {
-            width: 400px;
-            padding: 10px;
-            font-size: 16px;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #search-bar:focus {
+            border-color: #4CAF50;
         }
         #search-button {
-            padding: 10px 20px;
+            padding: 15px 20px;
             font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+        }
+        #search-button:hover {
+            background-color: #45a049;
         }
         #options {
             margin-top: 20px;
+            text-align: left;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        select {
+            margin-left: 10px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        /* Responsive design */
+        @media (max-width: 600px) {
+            #search-container {
+                margin: 50px 10px;
+            }
+            #header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-<div id="search-container">
-    <h1>Academic Paper Search</h1>
-    <form th:action="@{/search}" method="get">
-        <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
-        <div id="options">
-            <!-- Proximity Search Option -->
-            <label for="proximity">Enable Proximity Search</label>
-            <input type="checkbox" name="proximity"><br><br>
-
-            <!-- Page Size Option -->
-            <label for="size">Results per page:</label>
-            <select name="size">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-            </select>
-        </div>
-        <button id="search-button" type="submit">Search</button>
-    </form>
-</div>
+    <div id="header">
+        <h1>CSResearchHub</h1>
+    </div>
+    <div id="search-container">
+        <form th:action="@{/search}" method="get">
+            <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
+            <button id="search-button" type="submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+            <div id="options">
+                <label for="proximity">Proximity Search</label>
+                <input type="checkbox" name="proximity">
+                <br><br>
+                <label for="size">Results per page:</label>
+                <select name="size">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
