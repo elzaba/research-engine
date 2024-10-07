@@ -28,6 +28,7 @@ public class SearchController {
                                @RequestParam(value = "page", defaultValue = "0") int page,
                                @RequestParam(value = "size", defaultValue = "10") int pageSize,
                                @RequestParam(value = "proximity", defaultValue = "false") boolean proximitySearch,
+                               @RequestParam(value = "proximityDistance", defaultValue = "4") int proximityDistance,
                                Model model) throws Exception {
 
         if (query == null || query.isEmpty()) {
@@ -35,13 +36,14 @@ public class SearchController {
         }
 
         // Perform search
-        List<Paper> results = searchService.searchPapers(query, page, pageSize, proximitySearch);
+        List<Paper> results = searchService.searchPapers(query, page, pageSize, proximitySearch, proximityDistance);
 
         model.addAttribute("results", results);
         model.addAttribute("query", query);
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
         model.addAttribute("proximitySearch", proximitySearch);
+        model.addAttribute("proximityDistance", proximityDistance);
         return "search";
     }
 }
