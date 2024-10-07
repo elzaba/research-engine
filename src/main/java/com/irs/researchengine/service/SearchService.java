@@ -25,7 +25,7 @@ public class SearchService {
     @Value("${index.path}")
     private String INDEX_PATH;
 
-    public List<Paper> searchPapers(String queryStr, int page, int pageSize, boolean proximitySearch) throws Exception {
+    public List<Paper> searchPapers(String queryStr, int page, int pageSize, boolean proximitySearch, int proximityDistance) throws Exception {
         if (queryStr == null || queryStr.isBlank()) {
             throw new IllegalArgumentException("Search query cannot be null or empty");
         }
@@ -37,9 +37,9 @@ public class SearchService {
             IndexSearcher searcher = new IndexSearcher(reader);
             QueryParser parser = new MultiFieldQueryParser(new String[]{"title", "contents"}, new CustomAnalyzer());
 
-            // If proximity search is enabled, modify the query to use proximity search
+            // If proximity search is enabled, modify the query to use the proximity distance
             if (proximitySearch) {
-                queryStr = "\"" + queryStr + "\"~5";  // Setting a proximity range of 5
+                queryStr = "\"" + queryStr + "\"~" + proximityDistance;
             }
 
             Query query = parser.parse(queryStr);

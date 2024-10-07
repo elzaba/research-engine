@@ -148,83 +148,91 @@
 
 <body>
 
-    <h1>Search Results for: [[${query}]]</h1>
+<h1>Search Results for: [[${query}]]</h1>
 
-    <!-- Search Form -->
-    <div class="search-container">
-        <form method="get" action="/search" style="flex-grow: 1; display: flex; align-items: center;">
-            <div style="position: relative; flex-grow: 1;">
-                <input type="text" id="search-input" name="query" placeholder="Search..." th:value="${query}" autocomplete="off" aria-label="Search input" required />
-                <div id="autocomplete-suggestions" role="listbox" aria-labelledby="search-input"></div>
-            </div>
-            <select name="size" aria-label="Results per page" style="margin-left: 10px;">
-                <option value="10" th:selected="${pageSize == 10}">10</option>
-                <option value="20" th:selected="${pageSize == 20}">20</option>
-                <option value="50" th:selected="${pageSize == 50}">50</option>
-            </select>
-            <label for="proximity" style="margin-left: 10px;">Proximity Search</label>
-            <input type="checkbox" name="proximity" id="proximity" th:checked="${proximitySearch}" aria-label="Proximity Search" style="margin-left: 5px;" />
-            <input type="submit" value="Search" aria-label="Search button" style="margin-left: 10px;" />
-        </form>
-    </div>
-
-    <ul style="list-style-type: none; padding: 0;">
-        <li th:each="paper : ${results}" class="result">
-            <span class="result-title" th:text="${paper.title}"></span><br />
-            <span class="result-snippet" th:text="${paper.contents.substring(0, 300) + '...'}"></span><br />
-            <a class="result-link" th:href="@{${'file://' + paper.path}}" target="_blank" rel="noopener noreferrer">Open Document</a>
-        </li>
-    </ul>
-
-    <!-- Pagination -->
-    <div class="pagination">
-        <div>
-            <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch})}">Previous</a>
+<!-- Search Form -->
+<div class="search-container">
+    <form method="get" action="/search" style="flex-grow: 1; display: flex; align-items: center;">
+        <div style="position: relative; flex-grow: 1;">
+            <input type="text" id="search-input" name="query" placeholder="Search..." th:value="${query}" autocomplete="off" aria-label="Search input" required />
+            <div id="autocomplete-suggestions" role="listbox" aria-labelledby="search-input"></div>
         </div>
-        <div>
-            <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch})}">Next</a>
-        </div>
+        <select name="size" aria-label="Results per page" style="margin-left: 10px;">
+            <option value="10" th:selected="${pageSize == 10}">10</option>
+            <option value="20" th:selected="${pageSize == 20}">20</option>
+            <option value="50" th:selected="${pageSize == 50}">50</option>
+        </select>
+
+        <!-- Proximity Search Options -->
+        <label for="proximity" style="margin-left: 10px;">Proximity Search</label>
+        <input type="checkbox" name="proximity" id="proximity" th:checked="${proximitySearch}" aria-label="Proximity Search" style="margin-left: 5px;" />
+
+        <!-- Slider for proximity distance -->
+        <label for="proximityDistance" style="margin-left: 10px;">Proximity Range</label>
+        <input type="range" id="proximityDistance" name="proximityDistance" min="1" max="10" th:value="${proximityDistance}" oninput="document.getElementById('distanceValue').textContent=this.value" style="margin-left: 5px;">
+        <span id="distanceValue" th:text="${proximityDistance}">5</span>
+
+        <input type="submit" value="Search" aria-label="Search button" style="margin-left: 10px;" />
+    </form>
+</div>
+
+<ul style="list-style-type: none; padding: 0;">
+    <li th:each="paper : ${results}" class="result">
+        <span class="result-title" th:text="${paper.title}"></span><br />
+        <span class="result-snippet" th:text="${paper.contents.substring(0, 300) + '...'}"></span><br />
+        <a class="result-link" th:href="@{${'file://' + paper.path}}" target="_blank" rel="noopener noreferrer">Open Document</a>
+    </li>
+</ul>
+
+<!-- Pagination -->
+<div class="pagination">
+    <div>
+        <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch})}">Previous</a>
     </div>
+    <div>
+        <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch})}">Next</a>
+    </div>
+</div>
 
-    <script>
-        const input = document.getElementById("search-input");
-        const suggestionsContainer = document.getElementById("autocomplete-suggestions");
+<script>
+    const input = document.getElementById("search-input");
+    const suggestionsContainer = document.getElementById("autocomplete-suggestions");
 
-        input.addEventListener("input", function () {
-            const query = this.value;
-            if (query.length < 2) {  // Start fetching suggestions after 2 characters
-                suggestionsContainer.style.display = "none";
-                return;
-            }
+    input.addEventListener("input", function () {
+        const query = this.value;
+        if (query.length < 2) {  // Start fetching suggestions after 2 characters
+            suggestionsContainer.style.display = "none";
+            return;
+        }
 
-            fetch(`/autocomplete?query=${query}`)
-                .then(response => response.json())
-                .then(suggestions => {
-                    suggestionsContainer.innerHTML = ""; // Clear previous suggestions
-                    if (suggestions.length > 0) {
-                        suggestions.forEach(suggestion => {
-                            const div = document.createElement("div");
-                            div.className = "suggestion-item";
-                            div.textContent = suggestion;
-                            div.onclick = () => {
-                                input.value = suggestion; // Fill input with selected suggestion
-                                suggestionsContainer.style.display = "none"; // Hide suggestions
-                            };
-                            suggestionsContainer.appendChild(div);
-                        });
-                        suggestionsContainer.style.display = "block"; // Show suggestions
-                    } else {
-                        suggestionsContainer.style.display = "none"; // Hide if no suggestions
-                    }
-                });
-        });
+        fetch(`/autocomplete?query=${query}`)
+            .then(response => response.json())
+            .then(suggestions => {
+                suggestionsContainer.innerHTML = ""; // Clear previous suggestions
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement("div");
+                        div.className = "suggestion-item";
+                        div.textContent = suggestion;
+                        div.onclick = () => {
+                            input.value = suggestion; // Fill input with selected suggestion
+                            suggestionsContainer.style.display = "none"; // Hide suggestions
+                        };
+                        suggestionsContainer.appendChild(div);
+                    });
+                    suggestionsContainer.style.display = "block"; // Show suggestions
+                } else {
+                    suggestionsContainer.style.display = "none"; // Hide if no suggestions
+                }
+            });
+    });
 
-        document.addEventListener("click", function (event) {
-            if (!suggestionsContainer.contains(event.target) && event.target !== input) {
-                suggestionsContainer.style.display = "none"; // Hide suggestions on outside click
-            }
-        });
-    </script>
+    document.addEventListener("click", function (event) {
+        if (!suggestionsContainer.contains(event.target) && event.target !== input) {
+            suggestionsContainer.style.display = "none"; // Hide suggestions on outside click
+        }
+    });
+</script>
 
 </body>
 

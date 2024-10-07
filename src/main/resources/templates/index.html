@@ -80,6 +80,14 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        /* Slider styling */
+        .slider {
+            margin-top: 10px;
+        }
+        .slider span {
+            margin-left: 5px;
+            font-weight: bold;
+        }
         /* Responsive design */
         @media (max-width: 600px) {
             #search-container {
@@ -92,27 +100,34 @@
     </style>
 </head>
 <body>
-    <div id="header">
-        <h1>CSResearchHub</h1>
-    </div>
-    <div id="search-container">
-        <form th:action="@{/search}" method="get">
-            <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
-            <button id="search-button" type="submit">
-                <i class="fas fa-search"></i> Search
-            </button>
-            <div id="options">
-                <label for="proximity">Proximity Search</label>
-                <input type="checkbox" name="proximity">
-                <br><br>
-                <label for="size">Results per page:</label>
-                <select name="size">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
+<div id="header">
+    <h1>CSResearchHub</h1>
+</div>
+<div id="search-container">
+    <form th:action="@{/search}" method="get">
+        <input id="search-bar" type="text" name="query" placeholder="Search research papers..." required>
+        <button id="search-button" type="submit">
+            <i class="fas fa-search"></i> Search
+        </button>
+        <div id="options">
+            <label for="proximity">Proximity Search</label>
+            <input type="checkbox" name="proximity">
+            <br><br>
+            <label for="size">Results per page:</label>
+            <select name="size">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+
+            <!-- Proximity Range Slider -->
+            <div class="slider">
+                <label for="proximityDistance">Proximity Range</label>
+                <input type="range" id="proximityDistance" name="proximityDistance" min="1" max="10" value="5" oninput="document.getElementById('distanceValue').textContent=this.value">
+                <span id="distanceValue">5</span>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
+</div>
 </body>
 </html>
