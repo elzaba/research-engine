@@ -23,10 +23,9 @@ Setup Instructions
 - Open the src/main/resources/application.properties file and update the paths:
   ```
   spring.application.name=research-engine
-  docs.path=/path/to/your/citeseer/dataset  # Change this to your dataset path
   index.path=/path/to/your/index  # Change this to your desired index path
   ```
-- Ensure the docs.path points to the directory where the CiteSeer dataset is located. The index.path is where Lucene will store the indexed documents.
+- The index.path is where Lucene will store the indexed documents.
 
 3. Set Up the Project in IntelliJ or STS4
 - IntelliJ IDEA
@@ -59,7 +58,7 @@ Setup Instructions
 
 - Run the following curl command in your terminal:
   ```
-  curl -X GET http://localhost:8080/index
+  curl -X POST http://localhost:8080/index
   ```
 - This will trigger the indexing process. You should see a response indicating that indexing has started and completed successfully.
 6. Search for Papers
