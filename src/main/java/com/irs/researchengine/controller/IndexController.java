@@ -1,21 +1,28 @@
 package com.irs.researchengine.controller;
 
-import com.irs.researchengine.service.IndexService;
+import com.irs.researchengine.config.CategoryConfig;
+import com.irs.researchengine.service.ArxivApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController // Use RestController to handle responses directly
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
 public class IndexController {
 
     @Autowired
-    private IndexService indexService;
+    private ArxivApiService arxivApiService;
 
     @PostMapping("/index")
     public ResponseEntity<String> indexDocuments() {
         try {
-            indexService.indexPapers();
+        	List<String> categories = new ArrayList<>(CategoryConfig.getCategoryMap().keySet());
+            // Fetch papers from the ArXiv API
+            arxivApiService.fetchAllPapersFromCategories(categories);
+
             return ResponseEntity.ok("Indexing completed successfully.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -23,4 +30,5 @@ public class IndexController {
         }
     }
 }
+
 

@@ -2,7 +2,6 @@ package com.irs.researchengine.service;
 
 import com.irs.researchengine.data.Paper;
 import com.irs.researchengine.nlp.CustomAnalyzer;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -35,7 +34,10 @@ public class SearchService {
              DirectoryReader reader = DirectoryReader.open(dir)) {
 
             IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser parser = new MultiFieldQueryParser(new String[]{"title", "contents"}, new CustomAnalyzer());
+            QueryParser parser = new MultiFieldQueryParser(
+                new String[]{"title", "summary", "authors"}, 
+                new CustomAnalyzer()
+            );
 
             // If proximity search is enabled, modify the query to use the proximity distance
             if (proximitySearch) {
@@ -49,14 +51,21 @@ public class SearchService {
 
             for (int i = start; i < end; i++) {
                 Document doc = searcher.doc(results.scoreDocs[i].doc);
+                String authors = doc.get("authors");
                 papers.add(new Paper(
-                        doc.get("title"),
-                        doc.get("path"),
-                        doc.get("contents")
+                    doc.get("id"),
+                    doc.get("title"),
+                    doc.get("summary"),
+                    doc.get("pdfLink"),
+                    doc.get("comment"),
+                    doc.get("updated"),
+                    doc.get("published"),
+                    doc.get("primaryCategory"),
+                    doc.get("primaryCategoryCode"),
+                    authors != null ? List.of(authors.split(", ")) : new ArrayList<>()
                 ));
             }
         }
         return papers;
     }
 }
-
