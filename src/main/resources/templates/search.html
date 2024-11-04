@@ -55,41 +55,49 @@
         }
 
         .result {
-            background-color: #fff;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            transition: box-shadow 0.3s ease;
-        }
+        	background-color: #fff;
+        	margin-bottom: 20px;
+        	border: 1px solid #ddd;
+        	border-radius: 8px;
+        	padding: 20px;
+        	transition: box-shadow 0.3s ease;
+    	}
 
-        .result:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    	.result:hover {
+        	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    	}
 
-        .result-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0073e6;
-        }
+    	/* Title Styling */
+    	.result-title {
+        	font-size: 20px;
+        	font-weight: bold;
+        	color: #0073e6;
+        	margin-bottom: 10px;
+   	 	}
+   	 	
+   	 	.result-meta {
+        	font-size: 14px;
+        	color: #888;
+        	margin-bottom: 10px;
+   	 	}
 
         .result-snippet {
-            font-size: 14px;
-            color: #555;
-            margin-top: 5px;
-        }
+        	font-size: 15px;
+        	color: #444;
+       	 	margin-bottom: 15px;
+    	}
 
-        .result-link {
-            font-size: 14px;
-            color: #0073e6;
-            text-decoration: none;
-            margin-top: 10px;
-            display: inline-block;
-        }
+    	/* PDF Link Styling */
+    	.result-link {
+        	font-size: 14px;
+        	color: #0073e6;
+        	text-decoration: none;
+        	font-weight: bold;
+    	}
 
-        .result-link:hover {
-            text-decoration: underline;
-        }
+   	 	.result-link:hover {
+        	text-decoration: underline;
+   	 	}
 
         .pagination {
             margin-top: 20px;
@@ -178,9 +186,17 @@
 
 <ul style="list-style-type: none; padding: 0;">
     <li th:each="paper : ${results}" class="result">
-        <span class="result-title" th:text="${paper.title}"></span><br />
+        <!-- Clickable Paper Title -->
+        <a th:href="${paper.id}" class="result-title" target="_blank" rel="noopener noreferrer"
+           th:text="${paper.title}"></a><br />
+        <!-- Author Names and Published Year -->
+        <div class="result-meta">
+            <span th:text="${paper.authors}"></span>
+            <span th:text="|(${#strings.substring(paper.published, 0, 4)})|"></span>
+        </div>
         <span class="result-snippet" th:text="${paper.summary.substring(0, 300) + '...'}"></span><br />
-        <a class="result-link" th:href="${paper.pdfLink}" target="_blank" rel="noopener noreferrer">Open Document</a>
+        <!-- Updated PDF Link Text -->
+        <a class="result-link" th:href="${paper.pdfLink}" target="_blank" rel="noopener noreferrer">Open PDF</a>
     </li>
 </ul>
 
