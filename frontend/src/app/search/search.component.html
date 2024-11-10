@@ -1,5 +1,6 @@
 <div class="search-container">
-    <form (submit)="onSearch()" style="display: flex; align-items: center;">
+  <form (ngSubmit)="onSearch()" style="flex-grow: 1; display: flex; align-items: center;">
+    <div style="position: relative; flex-grow: 1;">
       <input
         type="text"
         id="search-input"
@@ -7,44 +8,79 @@
         name="query"
         placeholder="Search..."
         required
+        autocomplete="off"
+        aria-label="Search input"
+        (keyup)="onQueryChange(query)"
       />
-  
-      <button type="submit">Search</button>
-  
-      <label for="proximity" style="margin-left: 10px;">Enable Proximity Search</label>
-      <input
-        type="checkbox"
-        [(ngModel)]="proximity"
-        name="proximity"
-        id="proximity"
-        aria-label="Enable Proximity Search"
-        style="margin-left: 5px;"
-        (change)="toggleProximity()"
-      />
-  
-      <!-- Proximity Distance Slider (only visible if proximity is enabled) -->
-      <div *ngIf="proximity" style="display: flex; align-items: center; margin-left: 10px;">
-        <label for="proximityDistance">Proximity Range</label>
-        <input
-          type="range"
-          id="proximityDistance"
-          [(ngModel)]="proximityDistance"
-          name="proximityDistance"
-          min="1"
-          max="10"
-          style="margin-left: 5px;"
-          (input)="updateDistanceValue($event)"
-        />
-        <span>{{ proximityDistance }}</span>
+      <!-- Auto-complete Suggestions -->
+      <div *ngIf="suggestions.length > 0" id="autocomplete-suggestions">
+        <div
+          *ngFor="let suggestion of suggestions"
+          class="suggestion-item"
+          (click)="query = suggestion; onSearch()"
+        >
+          {{ suggestion }}
+        </div>
       </div>
-    </form>
+    </div>
+
+    
+    <select [(ngModel)]="pageSize" name="size" aria-label="Results per page" style="margin-left: 10px;">
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+      <option [value]="50">50</option>
+    </select>
+
+    <label for="proximity" style="margin-left: 10px;">Proximity Search</label>
+    <input
+      type="checkbox"
+      [(ngModel)]="proximity"
+      name="proximity"
+      id="proximity"
+      aria-label="Proximity Search"
+      style="margin-left: 5px;"
+      (change)="toggleProximity()"
+    />
+
+    <label *ngIf="proximity" for="proximityDistance" style="margin-left: 10px;">Proximity Range</label>
+    <input
+      *ngIf="proximity"
+      type="range"
+      id="proximityDistance"
+      [(ngModel)]="proximityDistance"
+      name="proximityDistance"
+      min="1"
+      max="10"
+      (input)="updateDistanceValue($event)"
+      style="margin-left: 5px;"
+    />
+    <span *ngIf="proximity">{{ proximityDistance }}</span>
+
+    <button type="submit" style="margin-left: 10px;">Search</button>
+  </form>
+</div>
+
+<h1>Search Results for: {{ query }}</h1>
+
+<ul style="list-style-type: none; padding: 0;">
+  <li *ngFor="let paper of results" class="result">
+    <h2 class="result-title">
+      <a [href]="paper.id" target="_blank" rel="noopener noreferrer">{{ paper.title }}</a>
+    </h2>
+    <div class="result-meta">
+      <span>{{ paper.authors }}</span>
+      <span>| ({{ paper.published | date: 'yyyy' }})</span>
+    </div>
+    <p class="result-snippet">{{ paper.summary | slice:0:300 }}...</p>
+    <a [href]="paper.pdfLink" class="result-link" target="_blank" rel="noopener noreferrer">Open PDF</a>
+  </li>
+</ul>
+
+<div class="pagination">
+  <div>
+    <a *ngIf="currentPage > 0" (click)="changePage(currentPage - 1)">Previous</a>
   </div>
-  
-  <ul>
-    <li *ngFor="let paper of results" class="result">
-      <h2>{{ paper.title }}</h2>
-      <p>{{ paper.contents }}</p>
-      <a [href]="'file://' + paper.path" target="_blank">Open Document</a>
-    </li>
-  </ul>
-  
+  <div>
+    <a *ngIf="results.length === pageSize" (click)="changePage(currentPage + 1)">Next</a>
+  </div>
+</div>

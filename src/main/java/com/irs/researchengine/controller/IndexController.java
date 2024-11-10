@@ -16,7 +16,7 @@ public class IndexController {
     @Autowired
     private ArxivApiService arxivApiService;
 
-    @PostMapping("/index")
+    @PostMapping("/api/index")
     public ResponseEntity<String> indexDocuments() {
         try {
         	List<String> categories = new ArrayList<>(CategoryConfig.getCategoryMap().keySet());

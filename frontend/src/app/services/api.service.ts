@@ -26,10 +26,10 @@ export class ApiService {
       .set('proximity', proximity.toString())
       .set('proximityDistance', proximityDistance.toString());
 
+    // Fix the URL string by using backticks
     return this.http.get<Paper[]>(`${this.baseUrl}/search`, { params });
   }
 
-  // Autocomplete Suggestions
   autocompleteSuggestions(query: string): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/autocomplete`, {
       params: { query }

@@ -58,7 +58,7 @@ Setup Instructions
 
 - Run the following curl command in your terminal:
   ```
-  curl -X POST http://localhost:8080/index
+  curl -X POST http://localhost:8080/api/index
   ```
 - This will trigger the indexing process. You should see a response indicating that indexing has started and completed successfully.
 6. Search for Papers
