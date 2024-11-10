@@ -1,0 +1,46 @@
+<div id="header">
+    <h1>CSResearchHub</h1>
+  </div>
+  <div id="search-container">
+    <form (submit)="onSearch()">
+      <input
+        id="search-bar"
+        type="text"
+        [(ngModel)]="query"
+        name="query"
+        placeholder="Search research papers..."
+        required
+      />
+      <button id="search-button" type="submit">
+        <i class="fas fa-search"></i> Search
+      </button>
+      <div id="options">
+        <label for="proximity">Proximity Search</label>
+        <input type="checkbox" [(ngModel)]="proximity" name="proximity" />
+  
+        <br /><br />
+        <label for="size">Results per page:</label>
+        <select [(ngModel)]="pageSize" name="size">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+  
+        <!-- Proximity Range Slider -->
+        <div class="slider">
+          <label for="proximityDistance">Proximity Range</label>
+          <input
+            type="range"
+            id="proximityDistance"
+            [(ngModel)]="proximityDistance"
+            name="proximityDistance"
+            min="1"
+            max="10"
+            (input)="updateDistanceValue($event)"
+          />
+          <span>{{ proximityDistance }}</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  

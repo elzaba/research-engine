@@ -1,0 +1,42 @@
+/* Add custom styles for the search component */
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  #search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .autocomplete-list {
+    background-color: white;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+  }
+  
+  .autocomplete-list div {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .autocomplete-list div:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .result {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .pagination button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  

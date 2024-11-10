@@ -1,0 +1,50 @@
+<div class="search-container">
+    <form (submit)="onSearch()" style="display: flex; align-items: center;">
+      <input
+        type="text"
+        id="search-input"
+        [(ngModel)]="query"
+        name="query"
+        placeholder="Search..."
+        required
+      />
+  
+      <button type="submit">Search</button>
+  
+      <label for="proximity" style="margin-left: 10px;">Enable Proximity Search</label>
+      <input
+        type="checkbox"
+        [(ngModel)]="proximity"
+        name="proximity"
+        id="proximity"
+        aria-label="Enable Proximity Search"
+        style="margin-left: 5px;"
+        (change)="toggleProximity()"
+      />
+  
+      <!-- Proximity Distance Slider (only visible if proximity is enabled) -->
+      <div *ngIf="proximity" style="display: flex; align-items: center; margin-left: 10px;">
+        <label for="proximityDistance">Proximity Range</label>
+        <input
+          type="range"
+          id="proximityDistance"
+          [(ngModel)]="proximityDistance"
+          name="proximityDistance"
+          min="1"
+          max="10"
+          style="margin-left: 5px;"
+          (input)="updateDistanceValue($event)"
+        />
+        <span>{{ proximityDistance }}</span>
+      </div>
+    </form>
+  </div>
+  
+  <ul>
+    <li *ngFor="let paper of results" class="result">
+      <h2>{{ paper.title }}</h2>
+      <p>{{ paper.contents }}</p>
+      <a [href]="'file://' + paper.path" target="_blank">Open Document</a>
+    </li>
+  </ul>
+  
