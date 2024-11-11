@@ -221,7 +221,7 @@
             return;
         }
 
-        fetch(`/autocomplete?query=${query}`)
+        fetch(`/api/autocomplete?query=${query}`)
             .then(response => response.json())
             .then(suggestions => {
                 suggestionsContainer.innerHTML = ""; // Clear previous suggestions
