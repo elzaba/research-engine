@@ -179,6 +179,10 @@
         <label for="proximityDistance" style="margin-left: 10px;">Proximity Range</label>
         <input type="range" id="proximityDistance" name="proximityDistance" min="1" max="10" th:value="${proximityDistance}" oninput="document.getElementById('distanceValue').textContent=this.value" style="margin-left: 5px;">
         <span id="distanceValue" th:text="${proximityDistance}">5</span>
+        
+        <!-- New Semantic Search Checkbox -->
+        <label for="semanticSearch" style="margin-left: 10px;">Semantic Search</label>
+        <input type="checkbox" name="semanticSearch" id="semanticSearch" th:checked="${semanticSearch}" aria-label="Semantic Search" style="margin-left: 5px;" />
 
         <input type="submit" value="Search" aria-label="Search button" style="margin-left: 10px;" />
     </form>
@@ -203,10 +207,16 @@
 <!-- Pagination -->
 <div class="pagination">
     <div>
-        <a th:if="${currentPage > 0}" th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch})}">Previous</a>
+        <a th:if="${currentPage > 0}" 
+           th:href="@{/search(query=${query}, page=${currentPage - 1}, size=${pageSize}, proximity=${proximitySearch}, proximityDistance=${proximityDistance}, semanticSearch=${semanticSearch})}">
+           Previous
+        </a>
     </div>
     <div>
-        <a th:if="${results.size() == pageSize}" th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch})}">Next</a>
+        <a th:if="${results.size() == pageSize}" 
+           th:href="@{/search(query=${query}, page=${currentPage + 1}, size=${pageSize}, proximity=${proximitySearch}, proximityDistance=${proximityDistance}, semanticSearch=${semanticSearch})}">
+           Next
+        </a>
     </div>
 </div>
 
