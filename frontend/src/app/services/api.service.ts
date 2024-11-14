@@ -18,13 +18,14 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   // Search Papers
-  searchPapers(query: string, page: number = 0, pageSize: number = 10, proximity: boolean = false, proximityDistance: number = 4): Observable<Paper[]> {
+  searchPapers(query: string, page: number = 0, pageSize: number = 10, proximity: boolean = false, proximityDistance: number = 4, semanticSearch: boolean = false): Observable<Paper[]> {
     let params = new HttpParams()
       .set('query', query)
       .set('page', page.toString())
       .set('size', pageSize.toString())
       .set('proximity', proximity.toString())
-      .set('proximityDistance', proximityDistance.toString());
+      .set('proximityDistance', proximityDistance.toString())
+      .set('semanticSearch', semanticSearch.toString());
 
     // Fix the URL string by using backticks
     return this.http.get<Paper[]>(`${this.baseUrl}/search`, { params });

@@ -24,7 +24,6 @@
       </div>
     </div>
 
-    
     <select [(ngModel)]="pageSize" name="size" aria-label="Results per page" style="margin-left: 10px;">
       <option [value]="10">10</option>
       <option [value]="20">20</option>
@@ -39,7 +38,6 @@
       id="proximity"
       aria-label="Proximity Search"
       style="margin-left: 5px;"
-      (change)="toggleProximity()"
     />
 
     <label *ngIf="proximity" for="proximityDistance" style="margin-left: 10px;">Proximity Range</label>
@@ -55,6 +53,16 @@
       style="margin-left: 5px;"
     />
     <span *ngIf="proximity">{{ proximityDistance }}</span>
+
+    <label for="semanticSearch" style="margin-left: 10px;">Semantic Search</label>
+    <input
+      type="checkbox"
+      [(ngModel)]="semanticSearch"
+      name="semanticSearch"
+      id="semanticSearch"
+      aria-label="Semantic Search"
+      style="margin-left: 5px;"
+    />
 
     <button type="submit" style="margin-left: 10px;">Search</button>
   </form>
@@ -84,3 +92,4 @@
     <a *ngIf="results.length === pageSize" (click)="changePage(currentPage + 1)">Next</a>
   </div>
 </div>
+

@@ -1,12 +1,21 @@
 # research-engine
 
-This project is a simple academic paper search engine built using Spring Boot, Thymeleaf, and Apache Lucene. It allows users to search for research papers from a local dataset, returning indexed documents with pagination.
+This project is an academic paper search engine built with Spring Boot, Lucene, and Angular. This search engine allows users to index and search research papers from Arxiv dataset. It supports both traditional keyword-based and semantic search using a FastAPI-based Python service for improved relevance.
+
+## Features
+- **Custom Analyzer**: Utilizes OpenNLP for POS tagging and lemmatization, improving query matching accuracy.
+- **Auto-Complete Suggestions**: Edge n-gram tokenization on titles provides auto-complete suggestions. 
+- **N-Gram Tokenization**: Bigrams and trigrams improve fuzzy search, handling misspellings and incomplete queries.
+- **Proximity Search**: Allows users to specify word distances, enhancing phrase-based queries.
+- **Semantic Search**: Provides semantic relevance in search results by leveraging Sentence-BERT embeddings and FAISS similarity search.
+- **User Interface**: Supports both Thymeleaf and Angular UIs.
 
 ## Requirements
 ```
     Java 17 or higher
     IntelliJ IDEA or Spring Tool Suite 4 (STS4)
     Gradle (Included with the project)
+    Python 3.6+ (for semantic search)
 ```
 
 Setup Instructions
@@ -24,8 +33,10 @@ Setup Instructions
   ```
   spring.application.name=research-engine
   index.path=/path/to/your/index  # Change this to your desired index path
+  faiss.api.url=http://127.0.0.1:8000
   ```
-- The index.path is where Lucene will store the indexed documents.
+- `index.path` is where Lucene will store the indexed documents.
+- `faiss.api.url` is the endpoint for semantic search service.
 
 3. Set Up the Project in IntelliJ or STS4
 - IntelliJ IDEA
@@ -52,7 +63,24 @@ Setup Instructions
     - In STS4:
         - Right-click the project in the Package Explorer, then select Run As > Spring Boot App.
 
-5. Index the Papers
+5. Set Up the Semantic Search Service (Python)
+   
+- The semantic search service provides enhanced search relevance by capturing semantic similarity in queries. Set up this Python-based FastAPI service in the python directory.
+
+  1. Navigate to the python folder:
+     ```
+     cd python
+     ```
+  2. Install dependencies:
+     ```
+     pip install fastapi uvicorn sentence-transformers faiss-cpu
+     ```
+  3. Start the FastAPI application:
+     ```
+     python3 -m uvicorn semantic_search:app --reload
+     ```
+
+6. Index the Papers
 
 - Once the application is running, you need to index the research papers before you can search them. You can do this through the terminal or command prompt.
 
@@ -61,8 +89,9 @@ Setup Instructions
   curl -X POST http://localhost:8080/api/index
   ```
 - This will trigger the indexing process. You should see a response indicating that indexing has started and completed successfully.
-6. Search for Papers
+7. Search for Papers
 
-    - Open your browser and navigate to http://localhost:8080.
+    - Open your browser and navigate to http://localhost:8080 for thymeleaf UI.
+    - Access the Angular UI at http://localhost:4200.
     - Enter a search query in the search box and click Search.
     - The results will display based on the indexed papers.  

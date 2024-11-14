@@ -25,14 +25,15 @@ public class SearchApiController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int pageSize,
             @RequestParam(value = "proximity", defaultValue = "false") boolean proximitySearch,
-            @RequestParam(value = "proximityDistance", defaultValue = "4") int proximityDistance) throws Exception {
+            @RequestParam(value = "proximityDistance", defaultValue = "4") int proximityDistance,
+            @RequestParam(value = "semanticSearch", defaultValue = "false") boolean semanticSearch) throws Exception {
 
         if (query == null || query.isEmpty()) {
             return ResponseEntity.badRequest().body(Collections.emptyList());  // Empty list for bad query
         }
 
         // Perform search and return JSON response
-        List<Paper> results = searchService.searchPapers(query, page, pageSize, proximitySearch, proximityDistance);
+        List<Paper> results = searchService.searchPapers(query, page, pageSize, proximitySearch, proximityDistance, semanticSearch);
         return ResponseEntity.ok(results);  // Return results as JSON
     }
 }

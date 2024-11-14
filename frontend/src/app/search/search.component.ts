@@ -14,6 +14,7 @@ export class SearchComponent implements OnInit {
   pageSize: number = 10;
   proximity: boolean = false;
   proximityDistance: number = 4;
+  semanticSearch: boolean = false;
   results: any[] = [];
   currentPage: number = 0;
   suggestions: string[] = [];
@@ -31,6 +32,7 @@ export class SearchComponent implements OnInit {
       this.pageSize = +params['pageSize'] || 10;
       this.proximity = params['proximity'] === 'true';
       this.proximityDistance = +params['proximityDistance'] || 4;
+      this.semanticSearch = params['semanticSearch'] === 'true';
       this.currentPage = +params['page'] || 0;
 
       // Perform search when initialized with URL params
@@ -48,7 +50,7 @@ export class SearchComponent implements OnInit {
   }
 
   onSearch(updateUrl: boolean = true): void {
-    this.apiService.searchPapers(this.query, this.currentPage, this.pageSize, this.proximity, this.proximityDistance)
+    this.apiService.searchPapers(this.query, this.currentPage, this.pageSize, this.proximity, this.proximityDistance, this.semanticSearch)
       .subscribe(
         data => this.results = data,
         error => console.error('Error fetching search results:', error)
@@ -75,6 +77,10 @@ export class SearchComponent implements OnInit {
     }
   }
 
+  toggleSemanticSearch(): void {
+    this.semanticSearch = !this.semanticSearch;
+  }
+
   onQueryChange(query: string): void {
     this.query = query;
     this.searchTerms.next(query); // Trigger auto-complete
@@ -88,6 +94,7 @@ export class SearchComponent implements OnInit {
         pageSize: this.pageSize,
         proximity: this.proximity,
         proximityDistance: this.proximityDistance,
+        semanticSearch: this.semanticSearch,
         page: this.currentPage
       },
       queryParamsHandling: 'merge'

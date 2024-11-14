@@ -128,8 +128,6 @@ public class ArxivApiService {
         if (nodes != null && nodes.getLength() > 0) {
             return nodes.item(0).getTextContent();
         }
-        // Log missing field
-        // System.err.println("Missing field: " + tagName + " in entry: " + entry.getElementsByTagName("id").item(0).getTextContent());
         return "";
     }
     
@@ -139,7 +137,6 @@ public class ArxivApiService {
             Element element = (Element) nodes.item(0);
             return element.getAttribute(attributeName);
         }
-        // System.err.println("Missing attribute: " + attributeName + " for tag: " + tagName);
         return "";
     }
 
