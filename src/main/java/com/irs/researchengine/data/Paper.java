@@ -13,6 +13,11 @@ public class Paper {
     private String primaryCategory;
     private String categoryCode;
     private List<String> authors;
+    
+    // Default constructor (required for Jackson)
+    public Paper() {
+    }
+    
     public Paper(String id, String title, String summary, String pdfLink, String comment, String updated,
             String published, String primaryCategory, String categoryCode, List<String> authors) {
     	this.id = id;

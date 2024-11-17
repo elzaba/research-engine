@@ -1,5 +1,6 @@
 package com.irs.researchengine.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.irs.researchengine.data.Paper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -7,47 +8,48 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import com.irs.researchengine.nlp.CustomAnalyzer;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class IndexService {
 
     @Value("${index.path}")
-    private String INDEX_PATH;
+    private String indexPath;
     
-    @Value("${faiss.api.url}")
-    private String faissApiUrl;
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    public void indexFromDataset(String datasetPath) throws IOException {
+        List<Paper> papers = Arrays.asList(objectMapper.readValue(new File(datasetPath), Paper[].class));
+        try {
+            indexPapers(papers);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void indexPapers(List<Paper> papers) throws Exception {
-        try (Directory dir = FSDirectory.open(Paths.get(INDEX_PATH))) {
+        try (Directory dir = FSDirectory.open(Paths.get(indexPath))) {
             Analyzer analyzer = new CustomAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
 
             try (IndexWriter writer = new IndexWriter(dir, iwc)) {
-            	List<Map<String, String>> faissDocs = new ArrayList<>();
                 for (Paper paper : papers) {
                     indexPaper(writer, paper);
-                    Map<String, String> faissDoc = new HashMap<>();
-                    faissDoc.put("id", paper.getId());
-                    faissDoc.put("text", paper.getSummary());  // Use summary or other relevant fields
-                    faissDocs.add(faissDoc);
                 }
-                // Call FAISS API to index embeddings
-                sendDocumentsToFaiss(faissDocs);
             }
         }
     }
@@ -69,12 +71,5 @@ public class IndexService {
         }
 
         writer.addDocument(doc);
-    }
-    
-    private void sendDocumentsToFaiss(List<Map<String, String>> documents) throws Exception {
-        // Use RestTemplate to POST documents to the FAISS indexing API
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<List<Map<String, String>>> request = new HttpEntity<>(documents);
-        restTemplate.postForEntity(faissApiUrl + "/index_documents/", request, String.class);
     }
 }
