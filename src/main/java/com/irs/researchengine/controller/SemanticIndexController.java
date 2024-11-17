@@ -1,32 +1,30 @@
 package com.irs.researchengine.controller;
 
-import com.irs.researchengine.service.IndexService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class IndexController {
+import com.irs.researchengine.service.SemanticIndexService;
 
-	@Autowired
-    private IndexService indexService;
+@RestController
+public class SemanticIndexController {
+
+    @Autowired
+    private SemanticIndexService semanticIndexService;
     
     @Value("${dataset.path}")
     private String datasetPath;
 
-	@PostMapping("/api/index")
-    public ResponseEntity<String> indexDocuments() {
+    @PostMapping("/api/index-faiss")
+    public ResponseEntity<String> indexDocumentsInFaiss() {
         try {
-            indexService.indexFromDataset(datasetPath);
-            return ResponseEntity.ok("Indexing completed successfully.");
+            semanticIndexService.indexFromDataset(datasetPath);
+            return ResponseEntity.ok("Semantic indexing completed successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error during indexing: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error during semantic indexing: " + e.getMessage());
         }
     }
 }
-
-

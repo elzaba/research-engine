@@ -1,16 +1,20 @@
 package com.irs.researchengine.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.irs.researchengine.config.CategoryConfig;
 import com.irs.researchengine.data.Paper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -24,22 +28,37 @@ public class ArxivApiService {
     private static final String ARXIV_API_BASE_URL = "http://export.arxiv.org/api/query?search_query=";
     private static final int MAX_RESULTS_PER_REQUEST = 1000;
     
-    @Autowired
-    private IndexService indexService; // Inject IndexService
+    @Value("${dataset.path}")
+    private String datasetPath;
     
-    public void fetchAllPapersFromCategories(List<String> categories) throws Exception {
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    private static final Logger logger = LoggerFactory.getLogger(ArxivApiService.class);
+
+    public void createDataset(List<String> categories) throws IOException {
+        List<Paper> allPapers = new ArrayList<>();
         for (String category : categories) {
-        	fetchAllPapers(category);
+            try {
+                logger.info("Fetching papers for category: {}", category);
+                List<Paper> categoryPapers = fetchAllPapers(category);
+                logger.info("Fetched {} papers for category: {}", categoryPapers.size(), category);
+                allPapers.addAll(categoryPapers);
+            } catch (Exception e) {
+                logger.error("Error fetching papers for category {}: {}", category, e.getMessage());
+            }
         }
+        savePapersToDataset(allPapers);
+        logger.info("Total number of papers in the dataset: {}", allPapers.size());
     }
 
-    public void fetchAllPapers(String category) throws Exception {
+    private List<Paper> fetchAllPapers(String category) throws Exception {
+        List<Paper> papers = new ArrayList<>();
         int start = 0;
         boolean moreResults = true;
-        int count = 0;
 
         while (moreResults) {
-        	String url = ARXIV_API_BASE_URL + "cat:" + category + "&start=" + start + "&max_results=" + MAX_RESULTS_PER_REQUEST;
+            String url = ARXIV_API_BASE_URL + "cat:" + category + "&start=" + start + "&max_results=" + MAX_RESULTS_PER_REQUEST;
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
 
@@ -50,51 +69,29 @@ public class ArxivApiService {
                         response.append(scanner.nextLine());
                     }
                 }
-                
                 List<Paper> batch = parseArxivResponse(response.toString(), category);
-                
-                // Check if batch is null or empty before indexing
-                if (batch == null || batch.isEmpty()) {
-                    System.err.println("No papers found for category " + category);
-                    moreResults = false;
-                    break;
-                }
-                
-                // Immediately index each paper in the batch
-                indexService.indexPapers(batch);
-                
-                count += batch.size();
-                
-                if (batch.size() < MAX_RESULTS_PER_REQUEST) {
-                    moreResults = false; // Stop if the last batch is smaller than the maximum
-                    System.out.printf("\n Total number of papers fetched for category %s = %d", category, count);
-                } else {
-                    start += MAX_RESULTS_PER_REQUEST; // Increment start for the next batch
-                }
-            } catch (SAXException e) {
-                System.err.println("XML Parsing error for category " + category + ": " + e.getMessage());
-                moreResults = false;
-            } catch (IOException e) {
-                System.err.println("Network error for category " + category + ": " + e.getMessage());
-                moreResults = false;
+                logger.info("Parsed {} papers in current batch for category: {}", batch.size(), category);
+
+                papers.addAll(batch);
+                moreResults = batch.size() >= MAX_RESULTS_PER_REQUEST;
+                start += MAX_RESULTS_PER_REQUEST;
             } catch (Exception e) {
-                System.err.println("Unexpected error for category " + category + ": " + e.getMessage());
+                logger.error("Error during fetch: {}", e.getMessage());
                 moreResults = false;
             }
         }
+        return papers;
     }
 
     private List<Paper> parseArxivResponse(String xmlResponse, String category) throws Exception {
         List<Paper> papers = new ArrayList<>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new java.io.ByteArrayInputStream(xmlResponse.getBytes()));
+        Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes()));
 
         NodeList entries = doc.getElementsByTagName("entry");
         for (int i = 0; i < entries.getLength(); i++) {
             Element entry = (Element) entries.item(i);
-            
-            // Collect authors
             List<String> authors = new ArrayList<>();
             NodeList authorNodes = entry.getElementsByTagName("author");
             for (int j = 0; j < authorNodes.getLength(); j++) {
@@ -103,19 +100,16 @@ public class ArxivApiService {
                     authors.add(authorName);
                 }
             }
-            
-            String primaryCategoryCode = getAttributeValue(entry, "arxiv:primary_category", "term");
-            String primaryCategory = CategoryConfig.getFullCategoryName(primaryCategoryCode);
             Paper paper = new Paper(
                 getTextContent(entry, "id"),
                 getTextContent(entry, "title"),
                 getTextContent(entry, "summary"),
                 getLinkHref(entry, "pdf"),
-                getTextContent(entry, "arxiv:comment") != null ? getTextContent(entry, "arxiv:comment") : "No comments available",
+                getTextContent(entry, "arxiv:comment", "No comments available"),
                 getTextContent(entry, "updated"),
                 getTextContent(entry, "published"),
-                primaryCategory,
-                primaryCategoryCode,
+                CategoryConfig.getFullCategoryName(category),
+                category,
                 authors
             );
             papers.add(paper);
@@ -123,19 +117,24 @@ public class ArxivApiService {
         return papers;
     }
 
+    private void savePapersToDataset(List<Paper> papers) throws IOException {
+        File datasetFile = new File(datasetPath);
+        if (!datasetFile.getParentFile().exists()) {
+            datasetFile.getParentFile().mkdirs();
+        }
+        objectMapper.writeValue(datasetFile, papers);
+        logger.info("Dataset created at: {}", datasetPath);
+    }
+
+    private String getTextContent(Element element, String tagName, String defaultValue) {
+        String content = getTextContent(element, tagName);
+        return (content.isEmpty()) ? defaultValue : content;
+    }
+
     private String getTextContent(Element entry, String tagName) {
         NodeList nodes = entry.getElementsByTagName(tagName);
         if (nodes != null && nodes.getLength() > 0) {
             return nodes.item(0).getTextContent();
-        }
-        return "";
-    }
-    
-    private String getAttributeValue(Element entry, String tagName, String attributeName) {
-        NodeList nodes = entry.getElementsByTagName(tagName);
-        if (nodes != null && nodes.getLength() > 0) {
-            Element element = (Element) nodes.item(0);
-            return element.getAttribute(attributeName);
         }
         return "";
     }
@@ -151,4 +150,5 @@ public class ArxivApiService {
         return "";
     }
 }
+
 
