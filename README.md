@@ -83,12 +83,27 @@ Setup Instructions
 6. Index the Papers
 
 - Once the application is running, you need to index the research papers before you can search them. You can do this through the terminal or command prompt.
-
-- Run the following curl command in your terminal:
+- Create the dataset (Option 1):
+  ```
+  curl -X POST http://localhost:8080/api/create-dataset
+  ```
+  - This will fetch computer science-related papers from Arxiv and create a dataset in JSON format.
+- **Alternative Option**: Download the dataset from this [link](https://drive.google.com/file/d/1LQL9NVH-CN33EVOF0xnoiOBITo5VbVKp/view?usp=drive_link)
+  and update the application.properties file in the resources directory by setting:
+  ```
+  dataset.path=/path/to/your/downloaded/dataset/directory
+  ```
+  - The dataset contains over 300,000 records.
+- Index the papers into lucene:
   ```
   curl -X POST http://localhost:8080/api/index
   ```
-- This will trigger the indexing process. You should see a response indicating that indexing has started and completed successfully.
+  - This will trigger the indexing process. You should see a response indicating that indexing has started and completed successfully.
+- Semantic Search (FAISS Indexing):
+  ```
+  curl -X POST http://localhost:8080/api/index-faiss
+  ```
+  - This step is required to enable vector-based semantic search functionality.
 7. Search for Papers
 
     - Open your browser and navigate to http://localhost:8080 for thymeleaf UI.
