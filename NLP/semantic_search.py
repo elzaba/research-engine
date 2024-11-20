@@ -79,13 +79,29 @@ def save_incremental():
 @app.post("/index_documents/")
 async def index_documents(documents: List[dict], batch_size: int = 100):
     """
-    Index documents in batches to optimize memory usage and prevent crashes.
+    Index documents in batches, ensuring no duplicate IDs are added.
     """
     total_docs = len(documents)
     logger.info(f"Starting to index {total_docs} documents in batches of {batch_size}.")
     
-    for i in range(0, total_docs, batch_size):
-        batch = documents[i:i + batch_size]
+    new_documents = []  # To store documents without duplicate IDs
+    new_ids = set()     # To track IDs being added in this batch
+    
+    with lock:
+        existing_ids = set(document_ids)  # Convert document_ids to a set for efficient lookup
+    
+    for doc in documents:
+        doc_id = doc["id"]
+        if doc_id not in existing_ids and doc_id not in new_ids:  # Check for duplicates
+            new_documents.append(doc)
+            new_ids.add(doc_id)
+
+    # Index new documents in batches
+    total_new_docs = len(new_documents)
+    logger.info(f"Filtering complete. {total_new_docs} new documents will be indexed.")
+    
+    for i in range(0, total_new_docs, batch_size):
+        batch = new_documents[i:i + batch_size]
         embeddings = [model.encode(doc["text"]) for doc in batch]
         ids = [doc["id"] for doc in batch]
         
@@ -93,10 +109,10 @@ async def index_documents(documents: List[dict], batch_size: int = 100):
             index.add(np.array(embeddings, dtype="float32"))
             document_ids.extend(ids)
         
-        logger.info(f"Indexed batch {i // batch_size + 1}/{(total_docs + batch_size - 1) // batch_size}.")
+        logger.info(f"Indexed batch {i // batch_size + 1}/{(total_new_docs + batch_size - 1) // batch_size}.")
         save_incremental()  # Save index and IDs after every batch
     
-    return {"message": f"{total_docs} documents indexed in FAISS HNSW successfully."}
+    return {"message": f"{total_new_docs} new documents indexed in FAISS HNSW successfully."}
 
 @app.get("/search/")
 async def search(query: str, top_k: int = 5):
