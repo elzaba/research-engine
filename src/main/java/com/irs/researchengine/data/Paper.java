@@ -13,6 +13,7 @@ public class Paper {
     private String primaryCategory;
     private String categoryCode;
     private List<String> authors;
+    private CitationInfo citationInfo;
     
     // Default constructor (required for Jackson)
     public Paper() {
@@ -30,7 +31,23 @@ public class Paper {
     	this.primaryCategory = primaryCategory;
     	this.categoryCode = categoryCode;
     	this.authors = authors;
-}
+    	this.citationInfo = null;
+    }
+    
+    public Paper(String id, String title, String summary, String pdfLink, String comment, String updated,
+            String published, String primaryCategory, String categoryCode, List<String> authors, CitationInfo citationInfo) {
+    	this.id = id;
+    	this.title = title;
+    	this.summary = summary;
+    	this.pdfLink = pdfLink;
+    	this.comment = comment;
+    	this.updated = updated;
+    	this.published = published;
+    	this.primaryCategory = primaryCategory;
+    	this.categoryCode = categoryCode;
+    	this.authors = authors;
+    	this.citationInfo = citationInfo;
+    }
 
     // Getters and setters for each field
     public String getId() {
@@ -107,5 +124,14 @@ public class Paper {
     
     public List<String> getAuthors() { return authors; }
     public void setAuthors(List<String> authors) { this.authors = authors; }
-}
 
+	public CitationInfo getCitationInfo() {
+		return citationInfo;
+	}
+
+	public void setCitationInfo(CitationInfo citationInfo) {
+		this.citationInfo = citationInfo;
+	}
+    
+    
+}

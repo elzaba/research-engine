@@ -201,6 +201,18 @@
         <span class="result-snippet" th:text="${paper.summary.substring(0, 300) + '...'}"></span><br />
         <!-- Updated PDF Link Text -->
         <a class="result-link" th:href="${paper.pdfLink}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        <!-- Display citation info if available -->
+        <div th:if="${paper.citationInfo.citationCount > 0}">
+            <p>Number of Citations: <span th:text="${paper.citationInfo.citationCount}"></span></p>
+            <p>Citing Papers:</p>
+            <p>
+                <span th:each="url, iterStat : ${paper.citationInfo.citationUrls}">
+                    <a th:href="${url}" target="_blank" th:text="${iterStat.index + 1}"></a>
+                    <span th:if="${iterStat.last}"></span>
+                    <span th:if="${!iterStat.last}">  </span>
+                </span>
+            </p>
+        </div>
     </li>
 </ul>
 
