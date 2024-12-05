@@ -201,6 +201,7 @@
         <span class="result-snippet" th:text="${paper.summary.substring(0, 300) + '...'}"></span><br />
         <!-- Updated PDF Link Text -->
         <a class="result-link" th:href="${paper.pdfLink}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        <a class="result-link" th:href="@{api/related-papers/{id}(id=${paper.id}, query=${query}, page=${currentPage}, size=${pageSize})}" rel="noopener noreferrer">View Related Papers</a>
         <!-- Display citation info if available -->
         <div th:if="${paper.citationInfo.citationCount > 0}">
             <p>Number of Citations: <span th:text="${paper.citationInfo.citationCount}"></span></p>
