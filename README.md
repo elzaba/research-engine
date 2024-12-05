@@ -77,7 +77,7 @@ Setup Instructions
      ```
   3. Start the FastAPI application:
      ```
-     python3 -m uvicorn semantic_search:app --reload
+     python3 -m uvicorn FastApiService:app --reload
      ```
 
 6. Index the Papers

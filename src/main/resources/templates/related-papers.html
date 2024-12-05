@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Related Papers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .result {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result:last-child {
+            border-bottom: none;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0073e6;
+            text-decoration: none;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-meta {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .result-snippet {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .result-link {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #0073e6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .result-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            display: block;
+            font-size: 16px;
+            color: #0073e6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Related Papers for: [[${mainPaper.title}]]</h1>
+        <div th:each="paper : ${relatedPapers}" class="result">
+            <a th:href="${paper.id}" class="result-title" target="_blank" rel="noopener noreferrer"
+               th:text="${paper.title}"></a>
+            <div class="result-meta">
+                <span th:text="${paper.authors}"></span>
+                <span th:text="'(' + ${#strings.substring(paper.published, 0, 4)} + ')'"></span>
+            </div>
+            <p class="result-snippet" th:text="${paper.summary.substring(0, 300) + '...'}"></p>
+            <a class="result-link" th:href="${paper.pdfLink}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        </div>
+        <a class="back-link" th:href="@{/search(query=${lastQuery})}">Back to Search Results</a>
+    </div>
+</body>
+</html>
+
